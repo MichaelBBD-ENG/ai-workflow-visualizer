@@ -1,10 +1,17 @@
 import { useState, useCallback } from 'react';
 import { ReactFlow, applyNodeChanges, applyEdgeChanges, addEdge } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
+import ReactFlowJobNode from './components/ours/ReactFlowJobNode';
+
+const nodeTypes = {
+  jobNode: ReactFlowJobNode,
+};
  
 const initialNodes = [
-  { id: 'n1', position: { x: 0, y: 0 }, data: { label: 'Node 1' } },
-  { id: 'n2', position: { x: 0, y: 100 }, data: { label: 'Node 2' } },
+  { type: 'jobNode',
+    id: 'n1', position: { x: 0, y: 0 }, data: { label: 'Node 1',steps:[{ name: 'step 1', run: 'run 1', uses: 'uses 1' }, { name: 'step 2', run: 'run 2', uses: 'uses 2' }, { name: 'step 3', run: 'run 3', uses: 'uses 3' }], runsOn: 'runs on 1', } },
+  { type: 'jobNode',
+    id: 'n2', position: { x: 0, y: 100 }, data: { label: 'Node 2',steps:[{ name: 'step 1', run: 'run 1', uses: 'uses 1' }, { name: 'step 2', run: 'run 2', uses: 'uses 2' }, { name: 'step 3', run: 'run 3', uses: 'uses 3' }], runsOn: 'runs on 2' } },
 ];
 const initialEdges = [{ id: 'n1-n2', source: 'n1', target: 'n2' }];
  
@@ -33,6 +40,7 @@ export default function App() {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        nodeTypes={nodeTypes}
         fitView
       />
     </div>
