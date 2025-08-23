@@ -8,9 +8,10 @@ export function yamlToReactFlow(yamlString: string): {
     position: { x: number; y: number };
     type: string;
   }[];
-  edges: { id: string; source: string; target: string }[];
+  edges: { id: string; source: string; target: string, animated?: boolean }[];
 } {
   const doc: any = yaml.parse(yamlString);
+  const on = doc.on || {};
   const jobs = doc.jobs || {};
 
   const nodes: {
@@ -19,15 +20,24 @@ export function yamlToReactFlow(yamlString: string): {
     position: { x: number; y: number };
     type: string;
   }[] = [];
-  const edges: { id: string; source: string; target: string }[] = [];
+  const edges: { id: string; source: string; target: string, animated?: boolean }[] = [];
 
   let x = 0;
   let y = 0;
 
+  nodes.push({
+    id: uuid(),
+    data: yaml.stringify(on),
+    position: { x, y},
+    type: "onNode",
+  });
+
+  x += 300;
+  y += 150;
+
   for (const [jobName, jobDef] of Object.entries<any>(jobs)) {
     const jobId = uuid();
 
-    // Job node (raw YAML for the job)
     nodes.push({
       id: jobId,
       data: yaml.stringify({ [jobName]: { ...jobDef, steps: undefined } }),
@@ -35,11 +45,9 @@ export function yamlToReactFlow(yamlString: string): {
       type: "jobNode",
     });
 
-    // Place next job diagonally
     x += 300;
     y += 150;
 
-    // Step nodes
     if (Array.isArray(jobDef.steps)) {
       jobDef.steps.forEach((step: any, index: number) => {
         const stepId = uuid();
@@ -50,15 +58,13 @@ export function yamlToReactFlow(yamlString: string): {
           type: "stepNode",
         });
 
-        // Connect step → next step
         if (index > 0) {
           edges.push({
             id: uuid(),
-            source: nodes[nodes.length - 2].id, // previous step
+            source: nodes[nodes.length - 2].id,
             target: stepId,
           });
         } else{
-          // Connect job → step
           edges.push({
             id: uuid(),
             source: jobId,
@@ -67,11 +73,9 @@ export function yamlToReactFlow(yamlString: string): {
         }
       });
 
-      // Push steps down visually
       y += 200;
     }
 
-    // Job dependencies
     if (jobDef.needs) {
       const needs = Array.isArray(jobDef.needs)
         ? jobDef.needs
@@ -86,10 +90,21 @@ export function yamlToReactFlow(yamlString: string): {
             id: uuid(),
             source: depJobNode.id,
             target: jobId,
+            animated: true
           });
         }
       });
     }
+  }
+
+  // connect on node to first job node
+  if(nodes.length > 2 && nodes[1].type === "jobNode"){
+    edges.push({
+      id: uuid(),
+      source: nodes[0].id,
+      target: nodes[1].id,
+      animated: true
+    });
   }
 
   return { nodes, edges };

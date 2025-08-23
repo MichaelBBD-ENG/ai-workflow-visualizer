@@ -4,10 +4,12 @@ import ReactFlowJobNode from "./ReactFlowJobNode";
 import '@xyflow/react/dist/style.css';
 import ReactFlowStepNode from "./ReactFlowStepNode";
 import { yamlToReactFlow } from "@/utils/utils";
+import ReactFlowOnNode from "./ReactFlowOnNode";
 
 const nodeTypes = {
-  jobNode: ReactFlowJobNode,
-  stepNode: ReactFlowStepNode
+    onNode: ReactFlowOnNode,
+    jobNode: ReactFlowJobNode,
+    stepNode: ReactFlowStepNode
 };
 
 export default function ReactFlowCanvas(
