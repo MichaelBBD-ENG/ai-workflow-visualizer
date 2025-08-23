@@ -3,13 +3,13 @@ import { Handle, Position  } from '@xyflow/react';
 import { Card, CardContent } from "@/components/ui/card";
 import { HoverCard, HoverCardTrigger, HoverCardContent } from "@/components/ui/hover-card";
 
-function ReactFlowJobNode({ data }: any) {
+function ReactFlowStepNode({ data }: any) {
   return (
     <HoverCard>
       <HoverCardTrigger asChild>
-        <Card className="rounded-2xl shadow-md border-b-blue-400">
+        <Card className="rounded-2xl shadow-md border-amber-300">
           <CardContent className="p-3">
-            <h3 className="text-lg font-semibold mb-3">Job</h3>
+            <h3 className="text-lg font-semibold mb-3">Step</h3>
             <pre className="bg-muted p-3 rounded border text-sm overflow-x-auto">
               <code>{data}</code>
             </pre>
@@ -28,4 +28,4 @@ function ReactFlowJobNode({ data }: any) {
   );
 }
 
-export default memo(ReactFlowJobNode);
+export default memo(ReactFlowStepNode);

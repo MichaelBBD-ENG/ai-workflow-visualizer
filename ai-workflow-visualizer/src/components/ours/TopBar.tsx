@@ -1,6 +1,7 @@
-import { Download, Upload } from "lucide-react";
+import { Download, Upload, X } from "lucide-react";
 import { Button } from "../ui/button";
 import { handleExportYAML } from "@/utils/download";
+import { ModeToggle } from "./ModeToggle";
 
 export default function TopBar({
   yamlString,
@@ -42,6 +43,11 @@ export default function TopBar({
               Upload
             </Button>
           </div>
+          <Button variant="outline" size="sm" className="gap-2 bg-transparent" onClick={() => setSelectedYamlString("")}>
+            <X className="h-4 w-4" />
+            Clear
+          </Button>
+          <ModeToggle />
         </div>
     )
 }
