@@ -1,9 +1,31 @@
-import { memo } from "react";
+import { memo, useState } from "react";
 import { Handle, Position  } from '@xyflow/react';
 import { Card, CardContent } from "@/components/ui/card";
 import { HoverCard, HoverCardTrigger, HoverCardContent } from "@/components/ui/hover-card";
+import { Button } from "../ui/button";
+import { LoaderFive } from "../ui/loader";
 
 function ReactFlowOnNode({ data }: any) {
+  const [aiSummary, setAiSummary] = useState<string | undefined>("");
+  
+  function askChatGPT() {
+    setAiSummary(undefined);
+    // simulate text streaming from chatgpt
+    const bagOfRandomWords = [
+      "Lorem ipsum dolor sit amet.",
+      "Sed do eiusmod tempor incididunt.",
+      "Ut enim ad minim veniam, quis nostrud.",
+      "Duis aute irure dolor in reprehenderit.",
+      "Excepteur sint occaecat cupidatat non proident."
+    ]
+    const interval = setInterval(() => {
+      setAiSummary((aiSummary) => aiSummary ?? "" + bagOfRandomWords[Math.floor(Math.random() * bagOfRandomWords.length)]);
+    }, 1000);
+
+    setTimeout(() => {
+      clearInterval(interval);
+    }, 5000);
+  }
   return (
     <HoverCard>
       <HoverCardTrigger asChild>
@@ -22,7 +44,15 @@ function ReactFlowOnNode({ data }: any) {
 
       {/* Popover with AI summary */}
       <HoverCardContent className="w-64 text-sm">
-        <p>{ "we will stream the ai summary from chatgpt"}</p>
+        { aiSummary === undefined ?
+          <LoaderFive text="Generating summary..." />
+          : aiSummary === "" ?
+          <Button onClick={askChatGPT} variant="outline" size="sm" className="gap-2 bg-transparent">
+            Ask ChatGPT what this job does
+          </Button>
+          :
+          <p>{aiSummary}</p>
+        }
       </HoverCardContent>
     </HoverCard>
   );
