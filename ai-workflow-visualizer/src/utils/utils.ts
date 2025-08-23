@@ -69,7 +69,6 @@ export function yamlToReactFlow(yamlString: string): {
             id: uuid(),
             source: jobId,
             target: stepId,
-            animated: true,
           });
         }
       });
@@ -91,10 +90,21 @@ export function yamlToReactFlow(yamlString: string): {
             id: uuid(),
             source: depJobNode.id,
             target: jobId,
+            animated: true
           });
         }
       });
     }
+  }
+
+  // connect on node to first job node
+  if(nodes.length > 2 && nodes[1].type === "jobNode"){
+    edges.push({
+      id: uuid(),
+      source: nodes[0].id,
+      target: nodes[1].id,
+      animated: true
+    });
   }
 
   return { nodes, edges };
