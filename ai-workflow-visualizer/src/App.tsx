@@ -1,35 +1,48 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useCallback } from 'react';
+import { ReactFlow, applyNodeChanges, applyEdgeChanges, addEdge } from '@xyflow/react';
+import '@xyflow/react/dist/style.css';
+import ReactFlowJobNode from './components/ours/ReactFlowJobNode';
 
-function App() {
-  const [count, setCount] = useState(0)
-
+const nodeTypes = {
+  jobNode: ReactFlowJobNode,
+};
+ 
+const initialNodes = [
+  { type: 'jobNode',
+    id: 'n1', position: { x: 0, y: 0 }, data: { label: 'Node 1',steps:[{ name: 'step 1', run: 'run 1', uses: 'uses 1' }, { name: 'step 2', run: 'run 2', uses: 'uses 2' }, { name: 'step 3', run: 'run 3', uses: 'uses 3' }], runsOn: 'runs on 1', } },
+  { type: 'jobNode',
+    id: 'n2', position: { x: 0, y: 100 }, data: { label: 'Node 2',steps:[{ name: 'step 1', run: 'run 1', uses: 'uses 1' }, { name: 'step 2', run: 'run 2', uses: 'uses 2' }, { name: 'step 3', run: 'run 3', uses: 'uses 3' }], runsOn: 'runs on 2' } },
+];
+const initialEdges = [{ id: 'n1-n2', source: 'n1', target: 'n2' }];
+ 
+export default function App() {
+  const [nodes, setNodes] = useState(initialNodes);
+  const [edges, setEdges] = useState(initialEdges);
+ 
+  const onNodesChange = useCallback(
+    (changes: any) => setNodes((nodesSnapshot) => applyNodeChanges(changes, nodesSnapshot)),
+    [],
+  );
+  const onEdgesChange = useCallback(
+    (changes: any) => setEdges((edgesSnapshot) => applyEdgeChanges(changes, edgesSnapshot)),
+    [],
+  );
+  const onConnect = useCallback(
+    (params: any) => setEdges((edgesSnapshot) => addEdge(params, edgesSnapshot)),
+    [],
+  );
+ 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div style={{ width: '100vw', height: '100vh' }}>
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
+        nodeTypes={nodeTypes}
+        fitView
+      />
+    </div>
+  );
 }
-
-export default App
