@@ -1,48 +1,25 @@
-import { useState, useCallback } from 'react';
-import { ReactFlow, applyNodeChanges, applyEdgeChanges, addEdge } from '@xyflow/react';
-import '@xyflow/react/dist/style.css';
-import ReactFlowJobNode from './components/ours/ReactFlowJobNode';
+import { useState } from "react"
+import TopBar from "./components/ours/TopBar"
+import Sidebar from "./components/ours/SideBar"
+import ReactFlowCanvas from "./components/ours/ReactFlowCanvas"
 
-const nodeTypes = {
-  jobNode: ReactFlowJobNode,
-};
- 
-const initialNodes = [
-  { type: 'jobNode',
-    id: 'n1', position: { x: 0, y: 0 }, data: { label: 'Node 1',steps:[{ name: 'step 1', run: 'run 1', uses: 'uses 1' }, { name: 'step 2', run: 'run 2', uses: 'uses 2' }, { name: 'step 3', run: 'run 3', uses: 'uses 3' }], runsOn: 'runs on 1', } },
-  { type: 'jobNode',
-    id: 'n2', position: { x: 0, y: 100 }, data: { label: 'Node 2',steps:[{ name: 'step 1', run: 'run 1', uses: 'uses 1' }, { name: 'step 2', run: 'run 2', uses: 'uses 2' }, { name: 'step 3', run: 'run 3', uses: 'uses 3' }], runsOn: 'runs on 2' } },
-];
-const initialEdges = [{ id: 'n1-n2', source: 'n1', target: 'n2' }];
- 
-export default function App() {
-  const [nodes, setNodes] = useState(initialNodes);
-  const [edges, setEdges] = useState(initialEdges);
- 
-  const onNodesChange = useCallback(
-    (changes: any) => setNodes((nodesSnapshot) => applyNodeChanges(changes, nodesSnapshot)),
-    [],
-  );
-  const onEdgesChange = useCallback(
-    (changes: any) => setEdges((edgesSnapshot) => applyEdgeChanges(changes, edgesSnapshot)),
-    [],
-  );
-  const onConnect = useCallback(
-    (params: any) => setEdges((edgesSnapshot) => addEdge(params, edgesSnapshot)),
-    [],
-  );
- 
+export default function WorkflowVisualizer() {
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
+  const [selectedYamlString, setSelectedYamlString] = useState("")
+
+  const handleCanvasClick = () => {
+    if (!isSidebarCollapsed) {
+      setIsSidebarCollapsed(true)
+    }
+  }
+
   return (
-    <div style={{ width: '100vw', height: '100vh' }}>
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        nodeTypes={nodeTypes}
-        fitView
-      />
+    <div className="h-screen flex flex-col bg-background">
+      <div className="flex flex-1 overflow-hidden relative">
+        <TopBar yamlString={""} setSelectedYamlString={setSelectedYamlString}/>
+        <Sidebar isSidebarCollapsed={isSidebarCollapsed} setIsSidebarCollapsed={setIsSidebarCollapsed}/>
+        <ReactFlowCanvas handleCanvasClick={handleCanvasClick} selectedYamlString={selectedYamlString} />
+      </div>
     </div>
-  );
+  )
 }
