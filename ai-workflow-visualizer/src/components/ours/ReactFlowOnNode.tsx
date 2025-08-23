@@ -45,7 +45,7 @@ function ReactFlowOnNode({ data }: any) {
       {/* Popover with AI summary */}
       <HoverCardContent className="w-64 text-sm">
         { aiSummary === undefined ?
-          <LoaderFive text="Generating chat..." />
+          <LoaderFive text="Generating summary..." />
           : aiSummary === "" ?
           <Button onClick={askChatGPT} variant="outline" size="sm" className="gap-2 bg-transparent">
             Ask ChatGPT what this job does
