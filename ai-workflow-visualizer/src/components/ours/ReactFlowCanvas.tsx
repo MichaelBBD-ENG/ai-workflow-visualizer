@@ -1,19 +1,14 @@
 import { applyNodeChanges, applyEdgeChanges, addEdge, ReactFlow } from "@xyflow/react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import ReactFlowJobNode from "./ReactFlowJobNode";
 import '@xyflow/react/dist/style.css';
+import ReactFlowStepNode from "./ReactFlowStepNode";
+import { yamlToReactFlow } from "@/utils/utils";
 
 const nodeTypes = {
   jobNode: ReactFlowJobNode,
+  stepNode: ReactFlowStepNode
 };
- 
-const initialNodes = [
-  { type: 'jobNode',
-    id: 'n1', position: { x: 0, y: 0 }, data: { label: 'Node 1',steps:[{ name: 'step 1', run: 'run 1', uses: 'uses 1' }, { name: 'step 2', run: 'run 2', uses: 'uses 2' }, { name: 'step 3', run: 'run 3', uses: 'uses 3' }], runsOn: 'runs on 1', } },
-  { type: 'jobNode',
-    id: 'n2', position: { x: 0, y: 100 }, data: { label: 'Node 2',steps:[{ name: 'step 1', run: 'run 1', uses: 'uses 1' }, { name: 'step 2', run: 'run 2', uses: 'uses 2' }, { name: 'step 3', run: 'run 3', uses: 'uses 3' }], runsOn: 'runs on 2' } },
-];
-const initialEdges = [{ id: 'n1-n2', source: 'n1', target: 'n2' }];
 
 export default function ReactFlowCanvas(
     {
@@ -24,8 +19,9 @@ export default function ReactFlowCanvas(
         selectedYamlString: string
     }
 ){
-    const [nodes, setNodes] = useState(initialNodes);
-    const [edges, setEdges] = useState(initialEdges);
+    const [nodes, setNodes] = useState<{ id: string; data: any; position: { x: number; y: number; }; type: string; }[]>([]);
+    const [edges, setEdges] = useState<{ id: string; source: string; target: string; }[]>([]);
+    const [showCanvas, setShowCanvas] = useState(false);
     
     const onNodesChange = useCallback(
         (changes: any) => setNodes((nodesSnapshot) => applyNodeChanges(changes, nodesSnapshot)),
@@ -39,10 +35,25 @@ export default function ReactFlowCanvas(
         (params: any) => setEdges((edgesSnapshot) => addEdge(params, edgesSnapshot)),
         [],
     );
+
+    useEffect(() => {
+        if(selectedYamlString === undefined || selectedYamlString.trim() === ""){ 
+            setShowCanvas(false);
+            setNodes([]);
+            setEdges([]);
+            return;
+        } else{
+            const { nodes, edges } = yamlToReactFlow(selectedYamlString);
+            setNodes(nodes);
+            setEdges(edges);
+            setShowCanvas(true);
+        }
+        
+    }, [selectedYamlString])
     
     return(
         <main className="flex-1 bg-background relative" onClick={handleCanvasClick}>
-          { selectedYamlString ?
+          { showCanvas ?
                  <ReactFlow
                     nodes={nodes}
                     edges={edges}

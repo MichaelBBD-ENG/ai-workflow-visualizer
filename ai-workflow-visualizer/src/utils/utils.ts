@@ -1,46 +1,93 @@
 import * as yaml from "yaml";
 import { v4 as uuid } from "uuid";
 
-export function yamlToReactFlow(yamlString: string) {
+export function yamlToReactFlow(yamlString: string): {
+  nodes: {
+    id: string;
+    data: string;
+    position: { x: number; y: number };
+    type: string;
+  }[];
+  edges: { id: string; source: string; target: string }[];
+} {
   const doc: any = yaml.parse(yamlString);
   const jobs = doc.jobs || {};
 
-  const nodes: any[] = [];
-  const edges: any[] = [];
+  const nodes: {
+    id: string;
+    data: string;
+    position: { x: number; y: number };
+    type: string;
+  }[] = [];
+  const edges: { id: string; source: string; target: string }[] = [];
 
   let x = 0;
   let y = 0;
 
   for (const [jobName, jobDef] of Object.entries<any>(jobs)) {
-    const nodeId = jobName;
+    const jobId = uuid();
 
-    // Node for the job
+    // Job node (raw YAML for the job)
     nodes.push({
-      id: nodeId,
-      data: { 
-        label: jobName, 
-        steps: jobDef["steps"] || [] 
-      },
+      id: jobId,
+      data: yaml.stringify({ [jobName]: { ...jobDef, steps: undefined } }),
       position: { x, y },
-      type: "default",
+      type: "jobNode",
     });
 
-    // Place nodes diagonally for now
-    x += 250;
-    y += 100;
+    // Place next job diagonally
+    x += 300;
+    y += 150;
 
-    // Edges from "needs"
-    if (jobDef["needs"]) {
-      const needs = Array.isArray(jobDef["needs"])
-        ? jobDef["needs"]
-        : [jobDef["needs"]];
+    // Step nodes
+    if (Array.isArray(jobDef.steps)) {
+      jobDef.steps.forEach((step: any, index: number) => {
+        const stepId = uuid();
+        nodes.push({
+          id: stepId,
+          data: yaml.stringify(step),
+          position: { x: x + index * 200, y: y },
+          type: "stepNode",
+        });
+
+        // Connect step → next step
+        if (index > 0) {
+          edges.push({
+            id: uuid(),
+            source: nodes[nodes.length - 2].id, // previous step
+            target: stepId,
+          });
+        } else{
+          // Connect job → step
+          edges.push({
+            id: uuid(),
+            source: jobId,
+            target: stepId,
+          });
+        }
+      });
+
+      // Push steps down visually
+      y += 200;
+    }
+
+    // Job dependencies
+    if (jobDef.needs) {
+      const needs = Array.isArray(jobDef.needs)
+        ? jobDef.needs
+        : [jobDef.needs];
 
       needs.forEach((dep: string) => {
-        edges.push({
-          id: uuid(),
-          source: dep,
-          target: nodeId,
-        });
+        const depJobNode = nodes.find((n) =>
+          n.data.includes(dep) && n.type === "jobNode"
+        );
+        if (depJobNode) {
+          edges.push({
+            id: uuid(),
+            source: depJobNode.id,
+            target: jobId,
+          });
+        }
       });
     }
   }
