@@ -2,12 +2,11 @@ import { Download, Upload, X } from "lucide-react";
 import { Button } from "../ui/button";
 import { handleExportYAML } from "@/utils/download";
 import { ModeToggle } from "./ModeToggle";
+import { nodesToYaml } from "@/utils/utils";
 
 export default function TopBar({
-  yamlString,
   setSelectedYamlString
 } : {
-  yamlString: string,
   setSelectedYamlString: React.Dispatch<React.SetStateAction<string>>
 }) {
   const handleImportYAML = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -23,10 +22,15 @@ export default function TopBar({
     event.target.value = ""
   }
 
+  function convertCurrentGraphToYaml(){
+    const yamlString = nodesToYaml();
+    handleExportYAML(yamlString);
+  }
+
     return (
         <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-20 bg-background border rounded-lg shadow-lg px-4 py-2 flex items-center gap-4">
           <h1 className="text-lg font-semibold">AI Workflow Visualiser</h1>
-          <Button onClick={() => handleExportYAML(yamlString)} variant="outline" size="sm" className="gap-2 bg-transparent">
+          <Button onClick={convertCurrentGraphToYaml} variant="outline" size="sm" className="gap-2 bg-transparent">
             <Download className="h-4 w-4" />
             Download
           </Button>

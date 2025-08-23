@@ -5,6 +5,8 @@ import '@xyflow/react/dist/style.css';
 import ReactFlowStepNode from "./ReactFlowStepNode";
 import { yamlToReactFlow } from "@/utils/utils";
 import ReactFlowOnNode from "./ReactFlowOnNode";
+import { useWorkflowNodesStore, useWorkflowEdgesStore, useWorkflowNameStore } from "@/store/store";
+import type { WorkFlowEdge, WorkFlowNode } from "@/types/types";
 
 const nodeTypes = {
     onNode: ReactFlowOnNode,
@@ -21,20 +23,35 @@ export default function ReactFlowCanvas(
         selectedYamlString: string
     }
 ){
-    const [nodes, setNodes] = useState<{ id: string; data: any; position: { x: number; y: number; }; type: string; }[]>([]);
-    const [edges, setEdges] = useState<{ id: string; source: string; target: string; }[]>([]);
+    const [nodes, setNodes] = useState<WorkFlowNode[]>([]);
+    const [edges, setEdges] = useState<WorkFlowEdge[]>([]);
+    const setZustandNodes = useWorkflowNodesStore((state) => state.setNodes);
+    const setZustandEdges = useWorkflowEdgesStore((state) => state.setEdges);
+    const setWorkflowName = useWorkflowNameStore((state) => state.setName);
     const [showCanvas, setShowCanvas] = useState(false);
     
     const onNodesChange = useCallback(
-        (changes: any) => setNodes((nodesSnapshot) => applyNodeChanges(changes, nodesSnapshot)),
+        (changes: any) => setNodes((nodesSnapshot) => {
+            const appliedChanges = applyNodeChanges(changes, nodesSnapshot);
+            setZustandNodes(appliedChanges);
+            return appliedChanges;
+        }),
         [],
     );
     const onEdgesChange = useCallback(
-        (changes: any) => setEdges((edgesSnapshot) => applyEdgeChanges(changes, edgesSnapshot)),
+        (changes: any) => setEdges((edgesSnapshot) => {
+            const appliedChanges = applyEdgeChanges(changes, edgesSnapshot);
+            setZustandEdges(appliedChanges);
+            return appliedChanges;
+        }),
         [],
     );
     const onConnect = useCallback(
-        (params: any) => setEdges((edgesSnapshot) => addEdge(params, edgesSnapshot)),
+        (params: any) => setEdges((edgesSnapshot) => {
+            const appliedChanges = addEdge(params, edgesSnapshot);
+            setZustandEdges(appliedChanges);
+            return appliedChanges;
+        }),
         [],
     );
 
@@ -45,9 +62,12 @@ export default function ReactFlowCanvas(
             setEdges([]);
             return;
         } else{
-            const { nodes, edges } = yamlToReactFlow(selectedYamlString);
+            const { workflowName, nodes, edges } = yamlToReactFlow(selectedYamlString);
             setNodes(nodes);
+            setZustandNodes(nodes);
             setEdges(edges);
+            setZustandEdges(edges);
+            setWorkflowName(workflowName);
             setShowCanvas(true);
         }
         
