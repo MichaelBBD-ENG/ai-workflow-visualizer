@@ -2,9 +2,11 @@ import { ScrollArea } from "@radix-ui/react-scroll-area"
 import { Bot, X, Send, Trash2 } from "lucide-react"
 import { Button } from "../ui/button"
 import { Card, CardContent } from "../ui/card"
-import { Input } from "../ui/input"
 import MarkdownContent from "./MarkDownContent"
 import { useState } from "react"
+import { Textarea } from "../ui/textarea"
+import { v4 as uuid } from "uuid"
+import { LoaderFive } from "../ui/loader"
 
 interface PromptHistoryItem {
   id: string
@@ -20,22 +22,31 @@ export default function Sidebar({
     setIsSidebarCollapsed: React.Dispatch<React.SetStateAction<boolean>>
 }) {
     const [currentPrompt, setCurrentPrompt] = useState("")
+    const [isLoading, setIsLoading] = useState(false)
     const [promptHistory, setPromptHistory] = useState<PromptHistoryItem[]>([])
     
     const handleSendPrompt = () => {
-    if (currentPrompt.trim()) {
-        const newPrompt: PromptHistoryItem = {
-        id: Date.now().toString(),
-        prompt: currentPrompt.trim(),
-        timestamp: new Date(),
+      setIsLoading(true)
+      setTimeout(() => {
+        if (currentPrompt.trim()) {
+          const newPrompt: PromptHistoryItem = {
+          id: uuid(),
+          prompt: currentPrompt.trim(),
+          timestamp: new Date(),
+          }
+          setPromptHistory((prev) => [newPrompt, ...prev])
+          setCurrentPrompt("")
+          setIsLoading(false)
         }
-        setPromptHistory((prev) => [newPrompt, ...prev])
-        setCurrentPrompt("")
-    }
+      }, 2000);
     }
 
     const clearHistory = () => {
       setPromptHistory([])
+    }
+
+    const deletePrompt = (id: string) => {
+      setPromptHistory((prev) => prev.filter((item) => item.id !== id))
     }
 
     return (
@@ -61,27 +72,33 @@ export default function Sidebar({
 
               <div className="p-4 border-b">
                 {/* Prompt Input */}
-                <div className="flex gap-2">
-                  <Input
-                    value={currentPrompt}
-                    onChange={(e) => setCurrentPrompt(e.target.value)}
-                    placeholder="Describe your workflow..."
-                    className="flex-1"
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && !e.shiftKey) {
-                        e.preventDefault()
-                        handleSendPrompt()
-                      }
-                    }}
-                  />
-                  <Button onClick={handleSendPrompt} size="sm" disabled={!currentPrompt.trim()} className="shrink-0">
-                    <Send className="h-4 w-4" />
-                  </Button>
-                </div>
+                { isLoading ?
+                    <div className="flex gap-2">
+                      <LoaderFive text="Generating workflow..." />
+                    </div>
+                    :
+                    <div className="flex gap-2">
+                      <Textarea
+                        value={currentPrompt}
+                        onChange={(e) => setCurrentPrompt(e.target.value)}
+                        placeholder="Describe your workflow..."
+                        className="flex-1 resize-none"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && !e.shiftKey) {
+                            e.preventDefault()
+                            handleSendPrompt()
+                          }
+                        }}
+                      />
+                      <Button onClick={handleSendPrompt} size="sm" disabled={!currentPrompt.trim()} className="shrink-0 bg-amber-400">
+                        <Send className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  }
               </div>
 
               {/* Prompt History */}
-              <div className="flex-1 flex flex-col">
+              <div className="flex-1 flex flex-col min-h-0">
                 <div className="p-4 pb-2 flex items-center justify-between">
                   <h3 className="text-sm font-medium">Prompt History</h3>
                   {promptHistory.length > 0 && (
@@ -97,18 +114,27 @@ export default function Sidebar({
                   )}
                 </div>
 
-                <ScrollArea className="flex-1 px-4">
+                <div className="flex-1 min-h-0 px-4">
+                <ScrollArea className="h-full">
                   {promptHistory.length === 0 ? (
                     <div className="text-center py-8 text-muted-foreground text-sm">
                       No prompts yet. Start by describing your workflow above.
                     </div>
                   ) : (
-                    <div className="space-y-3 pb-4">
+                    <div className="space-y-3 pb-4 h-full overflow-auto">
                       {promptHistory.map((item, _) => (
                         <Card key={item.id} className="bg-card">
                           <CardContent className="p-3">
-                            <div className="text-sm text-card-foreground mb-2">
+                            <div className="text-sm text-card-foreground mb-2 flex justify-between">
                               <MarkdownContent content={item.prompt} />
+                              <Button
+                                onClick={() => deletePrompt(item.id)}
+                                variant="ghost"
+                                size="sm"
+                                className="h-6 text-xs text-muted-foreground hover:text-red-400"
+                              >
+                                <Trash2 className="h-3 w-3 mr-1" />
+                              </Button>
                             </div>
                             <p className="text-xs text-muted-foreground">{item.timestamp.toLocaleTimeString()}</p>
                           </CardContent>
@@ -117,6 +143,7 @@ export default function Sidebar({
                     </div>
                   )}
                 </ScrollArea>
+                </div>
               </div>
             </div>
           )}

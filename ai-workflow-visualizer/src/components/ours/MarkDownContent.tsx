@@ -12,7 +12,7 @@ export default function MarkdownContent ({ content }: { content: string }) {
         const code = hasLanguage ? lines.slice(1).join("\n") : lines.join("\n")
 
         return (
-          <div key={index} className="my-2">
+          <div key={index}>
             {language && (
               <div className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-t border">{language}</div>
             )}
