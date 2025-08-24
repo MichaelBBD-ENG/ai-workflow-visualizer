@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { HoverCard, HoverCardTrigger, HoverCardContent } from "@/components/ui/hover-card";
 import { Button } from "../ui/button";
 import { LoaderFive } from "../ui/loader";
-import { client } from "../../utils/chatgpt";
+import { aiSummarizeSection } from "../../utils/chatgpt";
 
 function ReactFlowStepNode({ data }: any) {
   const [aiSummary, setAiSummary] = useState<string | undefined | "error">("");
@@ -13,12 +13,8 @@ function ReactFlowStepNode({ data }: any) {
     try{
       if (aiSummary === "" || aiSummary === "error"){
         setAiSummary(undefined);
-        const response = await client.responses.create({
-          model: 'gpt-4.1-mini',
-          input: `Can you summarize this github action workflow step in less than 100 words: ${data}`
-        });
-  
-        setAiSummary(response.output_text);
+        const response = await aiSummarizeSection(`Can you summarize this github action workflow step in less than 100 words: ${data}`);
+        setAiSummary(response);
       }
     } catch(e) {
       setAiSummary("error")

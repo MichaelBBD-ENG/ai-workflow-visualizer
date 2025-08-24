@@ -117,6 +117,7 @@ export default function ReactFlowCanvas(
         if(zustandNodes.length > 0 && zustandEdges.length > 0){
             setNodes(zustandNodes);
             setEdges(zustandEdges);
+            setShowCanvas(true);
         }
     }, [])
     

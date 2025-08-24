@@ -1,13 +1,37 @@
+import { useAIModelStore, useApiKeyStore } from "@/store/store";
 import OpenAI from "openai";
+import { toast } from "sonner";
 
-export const client = new OpenAI({
-    apiKey: import.meta.env.VITE_OPENAI_API_KEY,
-    dangerouslyAllowBrowser: true
-});
+let client: OpenAI | undefined = undefined;
+
+export function setClientAndAIModel(apiKey: string, aiModel: string) {
+  client = new OpenAI({ apiKey, dangerouslyAllowBrowser: true });
+  useApiKeyStore.getState().setApiKey(apiKey);
+  useAIModelStore.getState().setAIModel(aiModel);
+  toast.success("ChatGPT client initialized");
+}
+
+export async function aiSummarizeSection(prompt: string): Promise<string> {
+  if(client === undefined){
+    toast.error("ChatGPT client is not initialized, please provide an API key");
+    throw new Error("ChatGPT client is not initialized");
+  } else{
+    const response = await client.responses.create({
+            model: useAIModelStore.getState().aiModel,
+            input: prompt
+          });
+    
+    return response.output_text
+  }
+}
 
 export async function aiGenerateWorkflowYaml(prompt: string): Promise<string> {
+  if(client === undefined){
+    toast.error("ChatGPT client is not initialized, please provide an API key");
+    throw new Error("ChatGPT client is not initialized")
+  } else{
   const resp = await client.chat.completions.create({
-    model: "gpt-4.1-mini",
+    model: useAIModelStore.getState().aiModel,
     messages: [
       {
         role: "system",
@@ -42,4 +66,5 @@ jobs:
     .trim();
 
   return yaml;
+  }
 }

@@ -58,3 +58,31 @@ export const usePromptHistoryStore = create<{ history: PromptHistoryItem[]; setH
     )
   )
 )
+
+export const useApiKeyStore = create<{ apiKey: string; setApiKey: (apiKey: string) => void }>()(
+  devtools(
+    persist(
+      (set) => ({
+        apiKey: "",
+        setApiKey: (apiKey: string) => set({ apiKey }),
+      }),
+      {
+        name: "api-key",
+      }
+    )
+  )
+)
+
+export const useAIModelStore = create<{ aiModel: string; setAIModel: (aiModel: string) => void }>()(
+  devtools(
+    persist(
+      (set) => ({
+        aiModel: "gpt-4.1-mini",
+        setAIModel: (aiModel: string) => set({ aiModel }),
+      }),
+      {
+        name: "ai-model",
+      }
+    )
+  )
+)
