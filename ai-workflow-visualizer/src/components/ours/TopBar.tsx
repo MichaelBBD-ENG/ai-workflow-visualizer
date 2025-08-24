@@ -3,6 +3,7 @@ import { Button } from "../ui/button";
 import { handleExportYAML } from "@/utils/download";
 import { ModeToggle } from "./ModeToggle";
 import { nodesToYaml } from "@/utils/utils";
+import { toast } from "sonner";
 
 export default function TopBar({
   setSelectedYamlString
@@ -18,13 +19,19 @@ export default function TopBar({
         setSelectedYamlString(content)
       }
       reader.readAsText(file)
+    } else{
+      toast.error("Please select a YAML file");
     }
     event.target.value = ""
   }
 
   function convertCurrentGraphToYaml(){
     const yamlString = nodesToYaml();
-    handleExportYAML(yamlString);
+    if(!yamlString){
+      toast.error("No graph found to export");
+    } else{
+      handleExportYAML(yamlString);
+    }
   }
 
     return (

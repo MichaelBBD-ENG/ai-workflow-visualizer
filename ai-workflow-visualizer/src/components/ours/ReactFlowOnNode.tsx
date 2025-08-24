@@ -7,17 +7,21 @@ import { LoaderFive } from "../ui/loader";
 import { client } from "@/utils/chatgpt";
 
 function ReactFlowOnNode({ data }: any) {
-  const [aiSummary, setAiSummary] = useState<string | undefined>("");
+  const [aiSummary, setAiSummary] = useState<string | undefined | "error">("");
   
   async function askChatGPT() {
-    if (aiSummary === ""){
-      setAiSummary(undefined);
-      const response = await client.responses.create({
-        model: 'gpt-4.1-mini',
-        input: `Can you summarize this github action workflow step in less than 100 words: ${data}`
-      });
-
-      setAiSummary(response.output_text);
+    try{
+      if (aiSummary === "" || aiSummary === "error"){
+        setAiSummary(undefined);
+        const response = await client.responses.create({
+          model: 'gpt-4.1-mini',
+          input: `Can you summarize this github action workflow step in less than 100 words: ${data}`
+        });
+  
+        setAiSummary(response.output_text);
+      }
+    } catch(e) {
+      setAiSummary("error")
     }
   }
   return (
@@ -43,6 +47,10 @@ function ReactFlowOnNode({ data }: any) {
           : aiSummary === "" ?
           <Button onClick={askChatGPT} variant="outline" size="sm" className="gap-2 bg-transparent">
             Ask ChatGPT what this on does
+          </Button>
+          : aiSummary === "error" ?
+          <Button onClick={askChatGPT} variant="outline" size="sm" className="gap-2 bg-transparent text-red-400">
+            ChatGPT encountered some error, please try again
           </Button>
           :
           <p>{aiSummary}</p>

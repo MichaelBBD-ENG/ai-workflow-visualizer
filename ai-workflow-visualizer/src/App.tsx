@@ -2,6 +2,7 @@ import { useState } from "react"
 import TopBar from "./components/ours/TopBar"
 import Sidebar from "./components/ours/SideBar"
 import ReactFlowCanvas from "./components/ours/ReactFlowCanvas"
+import { Toaster } from "./components/ui/sonner"
 
 export default function WorkflowVisualizer() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
@@ -19,6 +20,7 @@ export default function WorkflowVisualizer() {
         <TopBar setSelectedYamlString={setSelectedYamlString}/>
         <Sidebar isSidebarCollapsed={isSidebarCollapsed} setIsSidebarCollapsed={setIsSidebarCollapsed}/>
         <ReactFlowCanvas handleCanvasClick={handleCanvasClick} selectedYamlString={selectedYamlString} />
+        <Toaster />
       </div>
     </div>
   )

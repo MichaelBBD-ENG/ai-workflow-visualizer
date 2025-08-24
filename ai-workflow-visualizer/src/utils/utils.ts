@@ -57,12 +57,14 @@ export function yamlToReactFlow(yamlString: string): {
             id: uuid(),
             source: nodes[nodes.length - 2].id,
             target: stepId,
+            type: "rfEdge",
           });
         } else{
           edges.push({
             id: uuid(),
             source: jobId,
             target: stepId,
+            type: "rfEdge",
           });
         }
       });
@@ -84,7 +86,8 @@ export function yamlToReactFlow(yamlString: string): {
             id: uuid(),
             source: depJobNode.id,
             target: jobId,
-            animated: true
+            animated: true,
+            type: "rfEdge",
           });
         }
       });
@@ -104,17 +107,20 @@ export function yamlToReactFlow(yamlString: string): {
       id: uuid(),
       source: nodes[0].id, // we are assuming the first node is the on node
       target: node.id,
-      animated: true
+      animated: true,
+      type: "rfEdge",
     });
   });
 
   return { workflowName: doc.name, nodes, edges };
 }
 
-export function nodesToYaml(): string {
+export function nodesToYaml(): string | undefined {
   const nodes = useWorkflowNodesStore.getState().nodes;
   const edges = useWorkflowEdgesStore.getState().edges;
   const workflowName = useWorkflowNameStore.getState().name;
+
+  if(!nodes || !edges || !workflowName) return undefined;
 
   const onNode = nodes.find((n) => n.type === "onNode");
   const on = onNode ? yaml.parse(onNode.data) : {};

@@ -1,4 +1,4 @@
-import { applyNodeChanges, applyEdgeChanges, addEdge, ReactFlow } from "@xyflow/react";
+import { applyNodeChanges, applyEdgeChanges, addEdge, ReactFlow, type Connection } from "@xyflow/react";
 import { useCallback, useEffect, useState } from "react";
 import ReactFlowJobNode from "./ReactFlowJobNode";
 import '@xyflow/react/dist/style.css';
@@ -7,11 +7,17 @@ import { yamlToReactFlow } from "@/utils/utils";
 import ReactFlowOnNode from "./ReactFlowOnNode";
 import { useWorkflowNodesStore, useWorkflowEdgesStore, useWorkflowNameStore } from "@/store/store";
 import type { WorkFlowEdge, WorkFlowNode } from "@/types/types";
+import ReactFlowEdge from "./ReactFlowEdge";
+import { toast } from "sonner";
 
 const nodeTypes = {
     onNode: ReactFlowOnNode,
     jobNode: ReactFlowJobNode,
     stepNode: ReactFlowStepNode
+};
+
+const edgeTypes = {
+    rfEdge: ReactFlowEdge,
 };
 
 export default function ReactFlowCanvas(
@@ -47,13 +53,36 @@ export default function ReactFlowCanvas(
         [],
     );
     const onConnect = useCallback(
-        (params: any) => setEdges((edgesSnapshot) => {
-            const appliedChanges = addEdge(params, edgesSnapshot);
-            setZustandEdges(appliedChanges);
-            return appliedChanges;
-        }),
+        (connection: any) => {
+            const edge = { ...connection, type: 'rfEdge' };
+            setEdges((edgesSnapshot) => {
+                const appliedChanges = addEdge(edge, edgesSnapshot);
+                setZustandEdges(appliedChanges);
+                return appliedChanges;
+            })
+        },
         [],
     );
+
+    const isValidConnection = (connection: WorkFlowEdge | Connection) => {
+        const { source, target } = connection;
+
+        const sourceType = nodes.find(n => n.id === source)?.type;
+        const targetType = nodes.find(n => n.id === target)?.type;
+
+        if (sourceType === "stepNode" && targetType === "jobNode"){ 
+            toast.error("Cannot connect step to job");
+            return false;
+        } else if (sourceType === "stepNode" && targetType === "onNode"){ 
+            toast.error("Cannot connect step to on");
+            return false;
+        } else if (sourceType === "onNode" && targetType === "stepNode"){ 
+            toast.error("Cannot connect on to step");
+            return false;
+        } else{
+            return true;
+        }
+    };
 
     useEffect(() => {
         if(selectedYamlString === undefined || selectedYamlString.trim() === ""){ 
@@ -83,6 +112,8 @@ export default function ReactFlowCanvas(
                     onEdgesChange={onEdgesChange}
                     onConnect={onConnect}
                     nodeTypes={nodeTypes}
+                    edgeTypes={edgeTypes}
+                    isValidConnection={isValidConnection}
                     fitView
                 />
                 :
