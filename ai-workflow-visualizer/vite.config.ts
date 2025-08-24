@@ -11,5 +11,5 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  base: "/ai-workflow-visualizer/",
+  base: "/ai-workflow-visualizer-website/",
 })
