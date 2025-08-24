@@ -1,5 +1,6 @@
 import { Check, Copy } from "lucide-react"
 import { useState } from "react";
+import { toast } from "sonner";
 
 export default function MarkdownContent ({ content }: { content: string }) {
   const [hasCopied, setHasCopied] = useState(false)
@@ -8,7 +9,7 @@ export default function MarkdownContent ({ content }: { content: string }) {
       await navigator.clipboard.writeText(contents);
       setHasCopied(true)
       setTimeout(() => setHasCopied(false), 2000);
-      //toast.success("Copied to clipboard");
+      toast.success("Copied to clipboard");
     } catch (err) {
       console.error('Failed to copy text: ', err);
     }

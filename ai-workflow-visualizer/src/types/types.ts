@@ -12,3 +12,9 @@ export type WorkFlowEdge = {
     type: string;
     animated?: boolean;
 }
+
+export type PromptHistoryItem = {
+  id: string
+  prompt: string
+  timestamp: Date
+}
