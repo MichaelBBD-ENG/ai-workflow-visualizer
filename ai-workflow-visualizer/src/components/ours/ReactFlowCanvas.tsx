@@ -56,7 +56,9 @@ export default function ReactFlowCanvas(
     );
     const onConnect = useCallback(
         (connection: any) => {
-            const edge = { ...connection, type: 'rfEdge' };
+            const edge = isOnConnectingToJob(connection) ? 
+                { ...connection, type: 'rfEdge' , animated: true }:
+                { ...connection, type: 'rfEdge' };
             setEdges((edgesSnapshot) => {
                 const appliedChanges = addEdge(edge, edgesSnapshot);
                 setZustandEdges(appliedChanges);
@@ -65,6 +67,13 @@ export default function ReactFlowCanvas(
         },
         [],
     );
+
+    const isOnConnectingToJob = (connection: WorkFlowEdge | Connection) => {
+        const { source, target } = connection;
+        const sourceType = nodes.find(n => n.id === source)?.type;
+        const targetType = nodes.find(n => n.id === target)?.type;
+        return (sourceType === "onNode" && targetType === "jobNode");
+    };
 
     const isValidConnection = (connection: WorkFlowEdge | Connection) => {
         const { source, target } = connection;
