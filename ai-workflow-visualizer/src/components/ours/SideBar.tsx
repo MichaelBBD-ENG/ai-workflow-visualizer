@@ -3,17 +3,14 @@ import { Bot, X, Send, Trash2 } from "lucide-react"
 import { Button } from "../ui/button"
 import { Card, CardContent } from "../ui/card"
 import MarkdownContent from "./MarkDownContent"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Textarea } from "../ui/textarea"
 import { v4 as uuid } from "uuid"
 import { LoaderFive } from "../ui/loader"
 import { aiGenerateWorkflowYaml } from "@/utils/chatgpt"
-
-interface PromptHistoryItem {
-  id: string
-  prompt: string
-  timestamp: Date
-}
+import { toast } from "sonner"
+import { usePromptHistoryStore } from "@/store/store"
+import type { PromptHistoryItem } from "@/types/types"
 
 export default function Sidebar({
   isSidebarCollapsed,
@@ -27,6 +24,8 @@ export default function Sidebar({
     const [currentPrompt, setCurrentPrompt] = useState("")
     const [isLoading, setIsLoading] = useState(false)
     const [promptHistory, setPromptHistory] = useState<PromptHistoryItem[]>([])
+    const setZustandPromptHistory = usePromptHistoryStore((state) => state.setHistory);
+    const zustandPromptHistory = usePromptHistoryStore((state) => state.history);
     
     const handleSendPrompt = async () => {
     if (!currentPrompt.trim()) return;
@@ -44,10 +43,10 @@ export default function Sidebar({
       };
 
       setPromptHistory((prev) => [newPrompt, ...prev]);
+      setZustandPromptHistory([newPrompt, ...promptHistory]);
       setCurrentPrompt("");
     } catch (error) {
-      console.error(error);
-      alert("Error generating workflow.");
+      toast.error("Error generating workflow.");
     } finally {
       setIsLoading(false);
     }
@@ -55,11 +54,19 @@ export default function Sidebar({
 
     const clearHistory = () => {
       setPromptHistory([])
+      setZustandPromptHistory([])
     }
 
     const deletePrompt = (id: string) => {
+      setZustandPromptHistory(promptHistory.filter((item) => item.id !== id))
       setPromptHistory((prev) => prev.filter((item) => item.id !== id))
     }
+
+    useEffect(() => {
+      if (zustandPromptHistory.length > 0) {
+        setPromptHistory(zustandPromptHistory)
+      }
+    }, [])
 
     return (
         <aside

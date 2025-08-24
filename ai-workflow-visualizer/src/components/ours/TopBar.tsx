@@ -8,7 +8,7 @@ import { toast } from "sonner";
 export default function TopBar({
   setSelectedYamlString
 } : {
-  setSelectedYamlString: React.Dispatch<React.SetStateAction<string>>
+  setSelectedYamlString: (content: string) => void
 }) {
   const handleImportYAML = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]

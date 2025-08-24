@@ -32,7 +32,9 @@ export default function ReactFlowCanvas(
     const [nodes, setNodes] = useState<WorkFlowNode[]>([]);
     const [edges, setEdges] = useState<WorkFlowEdge[]>([]);
     const setZustandNodes = useWorkflowNodesStore((state) => state.setNodes);
+    const zustandNodes = useWorkflowNodesStore((state) => state.nodes);
     const setZustandEdges = useWorkflowEdgesStore((state) => state.setEdges);
+    const zustandEdges = useWorkflowEdgesStore((state) => state.edges);
     const setWorkflowName = useWorkflowNameStore((state) => state.setName);
     const [showCanvas, setShowCanvas] = useState(false);
     
@@ -54,7 +56,9 @@ export default function ReactFlowCanvas(
     );
     const onConnect = useCallback(
         (connection: any) => {
-            const edge = { ...connection, type: 'rfEdge' };
+            const edge = isOnConnectingToJob(connection) ? 
+                { ...connection, type: 'rfEdge' , animated: true }:
+                { ...connection, type: 'rfEdge' };
             setEdges((edgesSnapshot) => {
                 const appliedChanges = addEdge(edge, edgesSnapshot);
                 setZustandEdges(appliedChanges);
@@ -63,6 +67,13 @@ export default function ReactFlowCanvas(
         },
         [],
     );
+
+    const isOnConnectingToJob = (connection: WorkFlowEdge | Connection) => {
+        const { source, target } = connection;
+        const sourceType = nodes.find(n => n.id === source)?.type;
+        const targetType = nodes.find(n => n.id === target)?.type;
+        return (sourceType === "onNode" && targetType === "jobNode");
+    };
 
     const isValidConnection = (connection: WorkFlowEdge | Connection) => {
         const { source, target } = connection;
@@ -101,6 +112,13 @@ export default function ReactFlowCanvas(
         }
         
     }, [selectedYamlString])
+
+    useEffect(() => {
+        if(zustandNodes.length > 0 && zustandEdges.length > 0){
+            setNodes(zustandNodes);
+            setEdges(zustandEdges);
+        }
+    }, [])
     
     return(
         <main className="flex-1 bg-background relative" onClick={handleCanvasClick}>
