@@ -108,7 +108,7 @@ export default function Sidebar({
                       size="sm"
                       className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground"
                     >
-                      <Trash2 className="h-3 w-3 mr-1" />
+                      <Trash2 className="h-3 w-3" />
                       Clear
                     </Button>
                   )}
@@ -133,7 +133,7 @@ export default function Sidebar({
                                 size="sm"
                                 className="h-6 text-xs text-muted-foreground hover:text-red-400"
                               >
-                                <Trash2 className="h-3 w-3 mr-1" />
+                                <Trash2 className="h-3 w-3" />
                               </Button>
                             </div>
                             <p className="text-xs text-muted-foreground">{item.timestamp.toLocaleTimeString()}</p>
