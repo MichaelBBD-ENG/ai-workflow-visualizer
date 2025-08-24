@@ -4,27 +4,21 @@ import { Card, CardContent } from "@/components/ui/card";
 import { HoverCard, HoverCardTrigger, HoverCardContent } from "@/components/ui/hover-card";
 import { Button } from "../ui/button";
 import { LoaderFive } from "../ui/loader";
+import { client } from "../../utils/chatgpt";
 
 function ReactFlowStepNode({ data }: any) {
   const [aiSummary, setAiSummary] = useState<string | undefined>("");
   
-  function askChatGPT() {
-    setAiSummary(undefined);
-    // simulate text streaming from chatgpt
-    const bagOfRandomWords = [
-      "Lorem ipsum dolor sit amet.",
-      "Sed do eiusmod tempor incididunt.",
-      "Ut enim ad minim veniam, quis nostrud.",
-      "Duis aute irure dolor in reprehenderit.",
-      "Excepteur sint occaecat cupidatat non proident."
-    ]
-    const interval = setInterval(() => {
-      setAiSummary((aiSummary) => (aiSummary ?? "") + bagOfRandomWords[Math.floor(Math.random() * bagOfRandomWords.length)]);
-    }, 1000);
+  async function askChatGPT() {
+    if (aiSummary === ""){
+      setAiSummary(undefined);
+      const response = await client.responses.create({
+        model: 'gpt-4.1-mini',
+        input: `Can you summarize this github action workflow step in less than 100 words: ${data}`
+      });
 
-    setTimeout(() => {
-      clearInterval(interval);
-    }, 5000);
+      setAiSummary(response.output_text);
+    }
   }
   return (
     <HoverCard>
@@ -48,7 +42,7 @@ function ReactFlowStepNode({ data }: any) {
           <LoaderFive text="Generating summary..." />
           : aiSummary === "" ?
           <Button onClick={askChatGPT} variant="outline" size="sm" className="gap-2 bg-transparent">
-            Ask ChatGPT what this job does
+            Ask ChatGPT what this step does
           </Button>
           :
           <p>{aiSummary}</p>
