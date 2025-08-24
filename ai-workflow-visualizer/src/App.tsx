@@ -18,7 +18,7 @@ export default function WorkflowVisualizer() {
     <div className="h-screen flex flex-col bg-background">
       <div className="flex flex-1 overflow-hidden relative">
         <TopBar setSelectedYamlString={setSelectedYamlString}/>
-        <Sidebar isSidebarCollapsed={isSidebarCollapsed} setIsSidebarCollapsed={setIsSidebarCollapsed}/>
+        <Sidebar setSelectedYamlString={setSelectedYamlString} isSidebarCollapsed={isSidebarCollapsed} setIsSidebarCollapsed={setIsSidebarCollapsed}/>
         <ReactFlowCanvas handleCanvasClick={handleCanvasClick} selectedYamlString={selectedYamlString} />
         <Toaster />
       </div>

@@ -7,6 +7,7 @@ import { useState } from "react"
 import { Textarea } from "../ui/textarea"
 import { v4 as uuid } from "uuid"
 import { LoaderFive } from "../ui/loader"
+import { aiGenerateWorkflowYaml } from "@/utils/chatgpt"
 
 interface PromptHistoryItem {
   id: string
@@ -15,31 +16,42 @@ interface PromptHistoryItem {
 }
 
 export default function Sidebar({
-    isSidebarCollapsed,
-    setIsSidebarCollapsed,
+  isSidebarCollapsed,
+  setIsSidebarCollapsed,
+  setSelectedYamlString,
 }: {
-    isSidebarCollapsed: boolean
-    setIsSidebarCollapsed: React.Dispatch<React.SetStateAction<boolean>>
+  isSidebarCollapsed: boolean;
+  setIsSidebarCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
+  setSelectedYamlString: React.Dispatch<React.SetStateAction<string>>;
 }) {
     const [currentPrompt, setCurrentPrompt] = useState("")
     const [isLoading, setIsLoading] = useState(false)
     const [promptHistory, setPromptHistory] = useState<PromptHistoryItem[]>([])
     
-    const handleSendPrompt = () => {
-      setIsLoading(true)
-      setTimeout(() => {
-        if (currentPrompt.trim()) {
-          const newPrompt: PromptHistoryItem = {
-          id: uuid(),
-          prompt: currentPrompt.trim(),
-          timestamp: new Date(),
-          }
-          setPromptHistory((prev) => [newPrompt, ...prev])
-          setCurrentPrompt("")
-          setIsLoading(false)
-        }
-      }, 2000);
+    const handleSendPrompt = async () => {
+    if (!currentPrompt.trim()) return;
+    setIsLoading(true);
+
+    try {
+      const yaml = await aiGenerateWorkflowYaml(currentPrompt);
+  
+      setSelectedYamlString(yaml);
+
+      const newPrompt: PromptHistoryItem = {
+        id: uuid(),
+        prompt: "```yaml\n" + yaml + "\n```",
+        timestamp: new Date(),
+      };
+
+      setPromptHistory((prev) => [newPrompt, ...prev]);
+      setCurrentPrompt("");
+    } catch (error) {
+      console.error(error);
+      alert("Error generating workflow.");
+    } finally {
+      setIsLoading(false);
     }
+  };
 
     const clearHistory = () => {
       setPromptHistory([])
