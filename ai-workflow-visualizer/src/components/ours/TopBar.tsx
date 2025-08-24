@@ -3,7 +3,7 @@ import { Button } from "../ui/button";
 import { handleExportYAML } from "@/utils/download";
 import { setClientAndAIModel } from "@/utils/chatgpt";
 import { ModeToggle } from "./ModeToggle";
-import { nodesToYaml } from "@/utils/utils";
+import { clearWorkflow, nodesToYaml } from "@/utils/utils";
 import { toast } from "sonner";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import { Input } from "../ui/input";
@@ -12,7 +12,7 @@ import { Label } from "../ui/label";
 export default function TopBar({
   setSelectedYamlString
 } : {
-  setSelectedYamlString: (content: string) => void
+  setSelectedYamlString: React.Dispatch<React.SetStateAction<string>>
 }) {
   const handleImportYAML = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -70,7 +70,10 @@ export default function TopBar({
               Upload
             </Button>
           </div>
-          <Button variant="outline" size="sm" className="gap-2 bg-transparent" onClick={() => setSelectedYamlString("")}>
+          <Button variant="outline" size="sm" className="gap-2 bg-transparent" onClick={() => {
+              clearWorkflow();
+              setSelectedYamlString("");
+            }}>
             <X className="h-4 w-4" />
             Clear
           </Button>

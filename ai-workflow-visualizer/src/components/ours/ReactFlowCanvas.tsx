@@ -96,7 +96,7 @@ export default function ReactFlowCanvas(
     };
 
     useEffect(() => {
-        if(selectedYamlString === undefined || selectedYamlString.trim() === ""){ 
+        if(selectedYamlString === undefined || selectedYamlString.trim() === ""){
             setShowCanvas(false);
             setNodes([]);
             setEdges([]);
@@ -143,8 +143,8 @@ export default function ReactFlowCanvas(
                     </div>
                     <h3 className="text-lg font-medium mb-2">Canvas Ready</h3>
                     <p className="text-sm max-w-md">
-                        This is where your workflow visualization will appear. Use the sidebar to prompt the AI and build your
-                        workflow or import a workflow.
+                        Your workflow will show up here. Build one with the AI from the sidebar, 
+                        or import from the top bar. Don’t forget to set your API key and model under “API & Model”.
                     </p>
                     </div>
                 </div>

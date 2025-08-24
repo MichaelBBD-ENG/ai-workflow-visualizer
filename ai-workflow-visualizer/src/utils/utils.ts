@@ -196,3 +196,17 @@ export function nodesToYaml(): string | undefined {
 
   return yaml.stringify(workflow);
 }
+
+export function canClearWorkflow() {
+  const nodes = useWorkflowNodesStore.getState().nodes;
+  const edges = useWorkflowEdgesStore.getState().edges;
+  const workflowName = useWorkflowNameStore.getState().name;
+  return nodes.length > 0 || edges.length > 0 || workflowName.length > 0;
+}
+
+
+export function clearWorkflow() {
+  useWorkflowNameStore.getState().setName("");
+  useWorkflowNodesStore.getState().setNodes([]);
+  useWorkflowEdgesStore.getState().setEdges([]);
+}
