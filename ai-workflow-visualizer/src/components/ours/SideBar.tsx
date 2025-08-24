@@ -62,7 +62,7 @@ export default function Sidebar({
               </Button>
             </div>
           ) : (
-            <div className="flex flex-col h-full">
+            <div className="flex flex-col h-full w-full">
               <div className="p-4 border-b flex items-center justify-between">
                 <h2 className="text-lg font-medium">AI Assistant</h2>
                 <Button onClick={() => setIsSidebarCollapsed(true)} variant="ghost" size="sm" className="w-6 h-6 p-0">
@@ -98,7 +98,7 @@ export default function Sidebar({
               </div>
 
               {/* Prompt History */}
-              <div className="flex-1 flex flex-col min-h-0">
+              <div className="flex-1 flex flex-col min-h-0 w-full min-w-0">
                 <div className="p-4 pb-2 flex items-center justify-between">
                   <h3 className="text-sm font-medium">Prompt History</h3>
                   {promptHistory.length > 0 && (
@@ -114,14 +114,14 @@ export default function Sidebar({
                   )}
                 </div>
 
-                <div className="flex-1 min-h-0 px-4">
-                <ScrollArea className="h-full">
+                <div className="flex-1 min-h-0 px-4 w-full min-w-0">
+                <ScrollArea className="h-full w-full">
                   {promptHistory.length === 0 ? (
                     <div className="text-center py-8 text-muted-foreground text-sm">
                       No prompts yet. Start by describing your workflow above.
                     </div>
                   ) : (
-                    <div className="space-y-3 pb-4 h-full overflow-auto">
+                    <div className="space-y-3 pb-4 h-full overflow-y-auto overflow-x-hidden">
                       {promptHistory.map((item, _) => (
                         <Card key={item.id} className="bg-card">
                           <CardContent className="p-3">
