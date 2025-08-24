@@ -93,6 +93,18 @@ export default function TopBar({
                       <div className="grid gap-3">
                         <Label htmlFor="api-key">API Key</Label>
                         <Input type="password" name="api-key" placeholder="****" />
+                        <p className="text-sm text-muted-foreground">
+                          Get your API key{" "}
+                          <a
+                            href="https://platform.openai.com/settings/organization/api-keys"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="underline text-blue-400"
+                          >
+                            here
+                          </a>
+                          .
+                        </p>
                       </div>
                       <div className="grid gap-3">
                         <Label htmlFor="ai-model">AI Model</Label>

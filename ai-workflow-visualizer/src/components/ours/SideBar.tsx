@@ -46,7 +46,11 @@ export default function Sidebar({
       setZustandPromptHistory([newPrompt, ...promptHistory]);
       setCurrentPrompt("");
     } catch (error) {
-      toast.error("Error generating workflow.");
+      if(error === "ChatGPT client is not initialized"){
+        // do nothing toast already showed error
+      } else{
+        toast.error("Error generating workflow, please try again later.");
+      }
     } finally {
       setIsLoading(false);
     }
