@@ -19,7 +19,7 @@ function ReactFlowJobNode({ data }: any) {
       "Excepteur sint occaecat cupidatat non proident."
     ]
     const interval = setInterval(() => {
-      setAiSummary((aiSummary) => aiSummary ?? "" + bagOfRandomWords[Math.floor(Math.random() * bagOfRandomWords.length)]);
+      setAiSummary((aiSummary) => (aiSummary ?? "") + bagOfRandomWords[Math.floor(Math.random() * bagOfRandomWords.length)]);
     }, 1000);
 
     setTimeout(() => {
